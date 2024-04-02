@@ -1,4 +1,4 @@
-module github.com/BohHye/wsc
+module github.com/BobHye/wsc
 
 go 1.16
 
