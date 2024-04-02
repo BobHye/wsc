@@ -2,13 +2,12 @@ package wsc
 
 import (
 	"errors"
-	"github.com/gorilla/websocket"
-	"github.com/jpillora/backoff"
-	"github.com/panjf2000/ants/v2"
-	"math/rand"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/gorilla/websocket"
+	"github.com/jpillora/backoff"
 )
 
 var (
