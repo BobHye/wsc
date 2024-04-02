@@ -30,7 +30,7 @@ type Wsc struct {
 	onClose func(code int, text string)
 
 	// 发送Text消息成功回调
-	onTextMessageSent func(message string)
+	onTextMessageSent func(message []byte)
 	// 发送Binary消息成功回调
 	onBinaryMessageSent func(data []byte)
 
@@ -42,7 +42,7 @@ type Wsc struct {
 	// 接受到Pong消息回调
 	onPongReceived func(appData string)
 	// 接受到Text消息回调
-	onTextMessageReceived func(message string)
+	onTextMessageReceived func(message []byte)
 	// 接受到Binary消息回调
 	onBinaryMessageReceived func(data []byte)
 	// 心跳
@@ -102,7 +102,7 @@ func New(url string) *Wsc {
 			MaxRecTime:        60 * time.Second,
 			RecFactor:         1.5,
 			MessageBufferSize: 256,
-			KeepaliveTime:     40,
+			KeepaliveTime:     300,
 			EnableReconnect:   true,
 		},
 		WebSocket: &WebSocket{
@@ -136,7 +136,7 @@ func (wsc *Wsc) OnClose(f func(code int, text string)) {
 	wsc.onClose = f
 }
 
-func (wsc *Wsc) OnTextMessageSent(f func(message string)) {
+func (wsc *Wsc) OnTextMessageSent(f func(message []byte)) {
 	wsc.onTextMessageSent = f
 }
 
@@ -156,7 +156,7 @@ func (wsc *Wsc) OnPongReceived(f func(appData string)) {
 	wsc.onPongReceived = f
 }
 
-func (wsc *Wsc) OnTextMessageReceived(f func(message string)) {
+func (wsc *Wsc) OnTextMessageReceived(f func(message []byte)) {
 	wsc.onTextMessageReceived = f
 }
 
@@ -184,7 +184,7 @@ func (wsc *Wsc) Connect() {
 		Factor: wsc.Config.RecFactor,
 		Jitter: true,
 	}
-	rand.Seed(time.Now().UTC().UnixNano())
+	// rand.Seed(time.Now().UTC().UnixNano())
 	for {
 		var err error
 		nextRec := b.Duration()
