@@ -236,13 +236,15 @@ func (wsc *Wsc) Connect() {
 			return defaultPongHandler(appData)
 		})
 		// 开启协程读
-		_ = ants.Submit(func() {
-			wsc.writeLoop()
-		})
+		wsc.writeLoop()
+		// _ = ants.Submit(func() {
+		// 	wsc.writeLoop()
+		// })
 		// 开启协程写
-		_ = ants.Submit(func() {
-			wsc.readLoop()
-		})
+		wsc.readLoop()
+		// _ = ants.Submit(func() {
+		// 	wsc.readLoop()
+		// })
 
 		return
 	}
@@ -308,6 +310,7 @@ func (wsc *Wsc) writeLoop() {
 				break
 			}
 		case <-keepaliveTick.C:
+			wsc.WebSocket.Conn.WriteMessage(websocket.PingMessage, nil)
 			if wsc.onKeepalive != nil {
 				wsc.onKeepalive()
 			}
@@ -357,11 +360,15 @@ func (wsc *Wsc) send(messageType int, data []byte) error {
 	if !wsc.IsConnected() {
 		return CloseErr
 	}
-	var err error
+	// var err error
 	// 超时时间
-	_ = wsc.WebSocket.Conn.SetWriteDeadline(time.Now().Add(wsc.Config.WriteWait))
-	err = wsc.WebSocket.Conn.WriteMessage(messageType, data)
-	return err
+	deadline := time.Now().Add(wsc.Cnfig.WriteWait)
+	if err := swc.WebSocket.Conn.SetWriteDeadline(deadline); err != nil {
+		return err
+	}
+	// _ = wsc.WebSocket.Conn.SetWriteDeadline(time.Now().Add(wsc.Config.WriteWait))
+	return wsc.WebSocket.Conn.WriteMessage(messageType, data)
+	// return err
 }
 
 // closeAndRecConn 断线重连
@@ -371,9 +378,10 @@ func (wsc *Wsc) closeAndRecConn() {
 	}
 	wsc.clean()
 	if wsc.Config.EnableReconnect {
-		_ = ants.Submit(func() {
-			wsc.Connect()
-		})
+		wsc.Connect()
+		// _ = ants.Submit(func() {
+		// 	wsc.Connect()
+		// })
 	}
 }
 
@@ -400,8 +408,10 @@ func (wsc *Wsc) clean() {
 		return
 	}
 	wsc.WebSocket.connMu.Lock()
+	defer wsc.WebSocket.connMu.Unlock()
+	
 	wsc.WebSocket.isConnected = false
 	_ = wsc.WebSocket.Conn.Close()
 	close(wsc.WebSocket.sendChan)
-	wsc.WebSocket.connMu.Unlock()
+	// wsc.WebSocket.connMu.Unlock()
 }
