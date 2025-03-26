@@ -265,7 +265,7 @@ func (wsc *Wsc) readLoop() {
 		// 收到TextMessage回调
 		case websocket.TextMessage:
 			if wsc.onTextMessageReceived != nil {
-				wsc.onTextMessageReceived(string(message))
+				wsc.onTextMessageReceived(message)
 			}
 			break
 		// 收到BinaryMessage回调
@@ -299,7 +299,7 @@ func (wsc *Wsc) writeLoop() {
 				return
 			case websocket.TextMessage:
 				if wsc.onTextMessageSent != nil {
-					wsc.onTextMessageSent(string(wsMsg.msg))
+					wsc.onTextMessageSent(wsMsg.msg)
 				}
 				break
 			case websocket.BinaryMessage:
