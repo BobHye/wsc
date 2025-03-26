@@ -361,8 +361,8 @@ func (wsc *Wsc) send(messageType int, data []byte) error {
 	}
 	// var err error
 	// 超时时间
-	deadline := time.Now().Add(wsc.Cnfig.WriteWait)
-	if err := swc.WebSocket.Conn.SetWriteDeadline(deadline); err != nil {
+	deadline := time.Now().Add(wsc.Config.WriteWait)
+	if err := wsc.WebSocket.Conn.SetWriteDeadline(deadline); err != nil {
 		return err
 	}
 	// _ = wsc.WebSocket.Conn.SetWriteDeadline(time.Now().Add(wsc.Config.WriteWait))
